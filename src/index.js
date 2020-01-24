@@ -15,6 +15,7 @@ import {
   Platform,
   ActivityIndicator
 } from 'react-native'
+import { NativeViewGestureHandler, PanGestureHandler } from 'react-native-gesture-handler';
 
 /**
  * Default styles
@@ -632,20 +633,35 @@ export default class extends Component {
     }
   }
 
+  panRef = React.createRef();
+  scrollRef = React.createRef();
+
   renderScrollView = pages => {
     if (Platform.OS === 'ios') {
       return (
-        <ScrollView ref={this.refScrollView}
-          {...this.props}
-          {...this.scrollViewPropOverrides()}
-          contentContainerStyle={[styles.wrapperIOS, this.props.style]}
-          contentOffset={this.state.offset}
-          onScrollBeginDrag={this.onScrollBegin}
-          onMomentumScrollEnd={this.onScrollEnd}
-          onScrollEndDrag={this.onScrollEndDrag}
-          style={this.props.scrollViewStyle}>
-          {pages}
-        </ScrollView>
+        <PanGestureHandler
+          onGestureEvent={this.props.onGestureEvent}
+          onHandlerStateChange={this.props.onHandlerStateChange}
+          ref={this.panRef}
+          simultaneousHandlers={this.scrollRef}
+        >
+          <NativeViewGestureHandler
+            ref={this.scrollRef}
+            simultaneousHandlers={this.panRef}
+          >
+            <ScrollView ref={this.refScrollView}
+              {...this.props}
+              {...this.scrollViewPropOverrides()}
+              contentContainerStyle={[styles.wrapperIOS, this.props.style]}
+              contentOffset={this.state.offset}
+              onScrollBeginDrag={this.onScrollBegin}
+              onMomentumScrollEnd={this.onScrollEnd}
+              onScrollEndDrag={this.onScrollEndDrag}
+              style={this.props.scrollViewStyle}>
+              {pages}
+            </ScrollView>
+          </NativeViewGestureHandler>
+        </PanGestureHandler>
        )
     }
     return (
