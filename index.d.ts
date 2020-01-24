@@ -1,4 +1,4 @@
-declare module 'react-native-swiper' {
+declare module 'react-native-swiper-gestures' {
     import { ViewStyle } from 'react-native'
     import { Component } from 'react'
 
