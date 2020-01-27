@@ -637,9 +637,37 @@ export default class extends Component {
   scrollRef = React.createRef();
 
   renderScrollView = pages => {
+    let content;
     if (Platform.OS === 'ios') {
-      return (
-        <PanGestureHandler
+      content = (
+        <ScrollView ref={this.refScrollView}
+          {...this.props}
+          {...this.scrollViewPropOverrides()}
+          contentContainerStyle={[styles.wrapperIOS, this.props.style]}
+          contentOffset={this.state.offset}
+          onScrollBeginDrag={this.onScrollBegin}
+          onMomentumScrollEnd={this.onScrollEnd}
+          onScrollEndDrag={this.onScrollEndDrag}
+          style={this.props.scrollViewStyle}>
+          {pages}
+        </ScrollView>
+      );
+    } else {
+      content = (
+        <ViewPagerAndroid ref={this.refScrollView}
+          {...this.props}
+          initialPage={this.props.loop ? this.state.index + 1 : this.state.index}
+          onPageScrollStateChanged={this.onPageScrollStateChanged}
+          onPageSelected={this.onScrollEnd}
+          key={pages.length}
+          style={[styles.wrapperAndroid, this.props.style]}>
+          {pages}
+        </ViewPagerAndroid>
+      );
+    }
+
+    return (
+      <PanGestureHandler
           onGestureEvent={this.props.onGestureEvent}
           onHandlerStateChange={this.props.onHandlerStateChange}
           ref={this.panRef}
@@ -649,31 +677,9 @@ export default class extends Component {
             ref={this.scrollRef}
             simultaneousHandlers={this.panRef}
           >
-            <ScrollView ref={this.refScrollView}
-              {...this.props}
-              {...this.scrollViewPropOverrides()}
-              contentContainerStyle={[styles.wrapperIOS, this.props.style]}
-              contentOffset={this.state.offset}
-              onScrollBeginDrag={this.onScrollBegin}
-              onMomentumScrollEnd={this.onScrollEnd}
-              onScrollEndDrag={this.onScrollEndDrag}
-              style={this.props.scrollViewStyle}>
-              {pages}
-            </ScrollView>
+            {content}
           </NativeViewGestureHandler>
-        </PanGestureHandler>
-       )
-    }
-    return (
-      <ViewPagerAndroid ref={this.refScrollView}
-        {...this.props}
-        initialPage={this.props.loop ? this.state.index + 1 : this.state.index}
-        onPageScrollStateChanged={this.onPageScrollStateChanged}
-        onPageSelected={this.onScrollEnd}
-        key={pages.length}
-        style={[styles.wrapperAndroid, this.props.style]}>
-        {pages}
-      </ViewPagerAndroid>
+      </PanGestureHandler>
     )
   }
 
